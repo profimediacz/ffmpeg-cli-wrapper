@@ -9,6 +9,7 @@ import net.bramp.ffmpeg.options.MainEncodingOptions;
 import net.bramp.ffmpeg.options.VideoEncodingOptions;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 
+import javax.annotation.CheckReturnValue;
 import java.net.URI;
 import java.util.List;
 
@@ -175,6 +176,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
    *
    * @return A new EncodingOptions capturing this Builder's state
    */
+  @CheckReturnValue
   @Override
   public EncodingOptions buildOptions() {
     // TODO When/if modelmapper supports @ConstructorProperties, we map this
@@ -202,6 +204,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
             video_preset));
   }
 
+  @CheckReturnValue
   @Override
   protected List<String> build(int pass) {
     Preconditions.checkState(parent != null, "Can not build without parent being set");
@@ -216,6 +219,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
    *     be 1 for the first pass, 2 for the second, and so on.
    * @return The arguments
    */
+  @CheckReturnValue
   @Override
   protected List<String> build(FFmpegBuilder parent, int pass) {
     if (pass > 0) {
@@ -315,6 +319,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     }
   }
 
+  @CheckReturnValue
   @Override
   protected FFmpegOutputBuilder getThis() {
     return this;

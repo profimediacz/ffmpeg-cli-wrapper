@@ -58,13 +58,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.21</version>
+                <version>1.7.25</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>annotations</artifactId>
                 <version>3.0.1u2</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.0.19</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -96,39 +100,33 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.1.7</version>
-                <scope>test</scope>
+                <version>1.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.2.15</version>
-                <scope>test</scope>
+                <version>2.7.19</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-integration</artifactId>
                 <version>1.3</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.nitorcreations</groupId>
                 <artifactId>matchers</artifactId>
                 <version>1.3</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.grizzly</groupId>
                 <artifactId>grizzly-http-server</artifactId>
-                <version>2.3.28</version>
-                <scope>test</scope>
+                <version>2.3.30</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -141,6 +139,11 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -304,6 +307,16 @@
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>1.6.7</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.coveo</groupId>
+                    <artifactId>fmt-maven-plugin</artifactId>
+                    <version>1.5.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.4.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -317,20 +330,6 @@
                         <!--arg>-Werror</arg-->
                     </compilerArgs>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <!-- mvn com.coveo:fmt-maven-plugin:format -->
-                <groupId>com.coveo</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>1.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -457,7 +456,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
@@ -495,6 +493,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
@@ -527,6 +526,7 @@
                     <aggregate>true</aggregate>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -534,12 +534,64 @@
                     <sourceEncoding>UTF-8</sourceEncoding>
                 </configuration>
             </plugin>
-
         </plugins>
 
         <defaultGoal>install</defaultGoal>
     </build>
-    
+
+    <profiles>
+        <profile>
+            <!-- googlejavaformat and errorprone requires Java 8 -->
+            <id>java18</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- mvn com.coveo:fmt-maven-plugin:format -->
+                        <groupId>com.coveo</groupId>
+                        <artifactId>fmt-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>format</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerId>javac-with-errorprone</compilerId>
+                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgs>
+                                <arg>-Xlint:all</arg>
+                            </compilerArgs>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.codehaus.plexus</groupId>
+                                <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                                <version>2.8.1</version>
+                            </dependency>
+                            <!-- override plexus-compiler-javac-errorprone's dependency on
+                                 Error Prone with the latest version -->
+                            <dependency>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>2.0.19</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <reporting>
 		<plugins>
 			<plugin>
@@ -702,8 +754,6 @@
 					<outputDirectory>%{project.reporting.outputDirectory}/cobertura</outputDirectory>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</reporting>
-	
 </project>
