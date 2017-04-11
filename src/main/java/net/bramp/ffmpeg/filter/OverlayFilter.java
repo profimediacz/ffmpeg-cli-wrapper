@@ -7,9 +7,14 @@ public class OverlayFilter extends VideoFilter {
   private String y;
 
   public OverlayFilter(String x, String y) {
-    super(FILTER_NAME);
+    super();
     this.x = x;
     this.y = y;
+  }
+
+  @Override
+  protected String getFilterName() {
+    return FILTER_NAME;
   }
 
   @Override

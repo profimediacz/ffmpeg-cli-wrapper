@@ -10,27 +10,28 @@ public class ScaleFilter extends VideoFilter {
   private String height;
 
   public ScaleFilter(String width, String height) {
-    super(FILTER_NAME);
     this.width = width;
     this.height = height;
   }
 
   public ScaleFilter(Integer width, Integer height) {
-    super(FILTER_NAME);
     this.width = width.toString();
     this.height = height.toString();
   }
 
   public ScaleFilter(String width) {
-    super(FILTER_NAME);
     this.width = width;
     this.height = SIZE_CALCULATED;
   }
 
   public ScaleFilter(Integer width) {
-    super(FILTER_NAME);
     this.width = width.toString();
     this.height = "-1";
+  }
+
+  @Override
+  protected String getFilterName() {
+    return FILTER_NAME;
   }
 
   @Override

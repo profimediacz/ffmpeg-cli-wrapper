@@ -40,15 +40,18 @@ public class TransposeFilter extends VideoFilter {
   private String passthrough;
 
   public TransposeFilter(Dir dir) {
-    super(FILTER_NAME);
     this.dir = dir.getValue();
     this.passthrough = Passthrough.NONE.getName();
   }
 
   public TransposeFilter(Dir dir, Passthrough passthrough) {
-    super(FILTER_NAME);
     this.dir = dir.getValue();
     this.passthrough = passthrough.getName();
+  }
+
+  @Override
+  protected String getFilterName() {
+    return FILTER_NAME;
   }
 
   @Override

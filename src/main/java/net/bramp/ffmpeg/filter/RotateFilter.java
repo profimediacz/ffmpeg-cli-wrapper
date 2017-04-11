@@ -7,8 +7,12 @@ public class RotateFilter extends VideoFilter {
   private String angle;
 
   public RotateFilter(String angle) {
-    super(FILTER_NAME);
     this.angle = angle;
+  }
+
+  @Override
+  protected String getFilterName() {
+    return FILTER_NAME;
   }
 
   @Override

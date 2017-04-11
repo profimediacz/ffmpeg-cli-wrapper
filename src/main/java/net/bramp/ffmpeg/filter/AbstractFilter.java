@@ -3,16 +3,8 @@ package net.bramp.ffmpeg.filter;
 
 public abstract class AbstractFilter {
 
-  protected AbstractFilter(String filterName) {
-    super();
-    this.filterName = filterName;
-  }
-
-  protected String filterName = "UNDEFINED";
-
-  protected String getFilterName() {
-    return filterName;
-  }
+  protected abstract String getFilterName();
 
   public abstract String getCommandString();
+
 }
