@@ -63,8 +63,10 @@ public class FFmpeg extends FFcommon {
   public static final int AUDIO_SAMPLE_48000 = 48000;
   public static final int AUDIO_SAMPLE_96000 = 96000;
 
-  static final Pattern CODECS_REGEX =
+  static final Pattern CODECS_REGEX_OLD =
       Pattern.compile("^ ([ D][ E][VAS][ S][ D][ T]) (\\S+)\\s+(.*)$");
+  static final Pattern CODECS_REGEX =
+      Pattern.compile("^ ([\\.D][\\.E][VAS][\\.I][\\.L][\\.S]) (\\S+)\\s+(.*)$");
   static final Pattern FORMATS_REGEX = Pattern.compile("^ ([ D][ E]) (\\S+)\\s+(.*)$");
 
   /** Supported codecs */
@@ -126,9 +128,15 @@ public class FFmpeg extends FFcommon {
         String line;
         while ((line = r.readLine()) != null) {
           Matcher m = CODECS_REGEX.matcher(line);
+          if (!m.matches()) {
+            m = CODECS_REGEX_OLD.matcher(line);
+            if (!m.matches()) continue;
+          }
           if (!m.matches()) continue;
 
-          codecs.add(new Codec(m.group(2), m.group(3), m.group(1)));
+          if (m.group(2).length() > 1) {
+            codecs.add(new Codec(m.group(2), m.group(3), m.group(1)));
+          }
         }
 
         throwOnError(p);
