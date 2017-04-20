@@ -1,27 +1,24 @@
 package net.bramp.ffmpeg;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
+
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.math.Fraction;
+
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.info.Codec;
 import net.bramp.ffmpeg.info.Format;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
-import org.apache.commons.lang3.math.Fraction;
-
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wrapper around FFmpeg
@@ -62,18 +59,6 @@ public class FFmpeg extends FFcommon {
   public static final int AUDIO_SAMPLE_44100 = 44100;
   public static final int AUDIO_SAMPLE_48000 = 48000;
   public static final int AUDIO_SAMPLE_96000 = 96000;
-
-  static final Pattern CODECS_REGEX_OLD =
-      Pattern.compile("^ ([ D][ E][VAS][ S][ D][ T]) (\\S+)\\s+(.*)$");
-  static final Pattern CODECS_REGEX =
-      Pattern.compile("^ ([\\.D][\\.E][VAS][\\.I][\\.L][\\.S]) (\\S+)\\s+(.*)$");
-  static final Pattern FORMATS_REGEX = Pattern.compile("^ ([ D][ E]) (\\S+)\\s+(.*)$");
-
-  /** Supported codecs */
-  List<Codec> codecs = null;
-
-  /** Supported formats */
-  List<Format> formats = null;
 
   public FFmpeg() throws IOException {
     this(DEFAULT_PATH, new RunProcessFunction());
@@ -118,61 +103,12 @@ public class FFmpeg extends FFcommon {
 
   public synchronized @Nonnull List<Codec> codecs() throws IOException {
     checkIfFFmpeg();
-
-    if (this.codecs == null) {
-      codecs = new ArrayList<>();
-
-      Process p = runFunc.run(ImmutableList.of(path, "-codecs"));
-      try {
-        BufferedReader r = wrapInReader(p);
-        String line;
-        while ((line = r.readLine()) != null) {
-          Matcher m = CODECS_REGEX.matcher(line);
-          if (!m.matches()) {
-            m = CODECS_REGEX_OLD.matcher(line);
-            if (!m.matches()) continue;
-          }
-          if (!m.matches()) continue;
-
-          if (m.group(2).length() > 1) {
-            codecs.add(new Codec(m.group(2), m.group(3), m.group(1)));
-          }
-        }
-
-        throwOnError(p);
-        this.codecs = ImmutableList.copyOf(codecs);
-      } finally {
-        p.destroy();
-      }
-    }
-
-    return codecs;
+    return super.codecs();
   }
 
   public synchronized @Nonnull List<Format> formats() throws IOException {
     checkIfFFmpeg();
-
-    if (this.formats == null) {
-      formats = new ArrayList<>();
-
-      Process p = runFunc.run(ImmutableList.of(path, "-formats"));
-      try {
-        BufferedReader r = wrapInReader(p);
-        String line;
-        while ((line = r.readLine()) != null) {
-          Matcher m = FORMATS_REGEX.matcher(line);
-          if (!m.matches()) continue;
-
-          formats.add(new Format(m.group(2), m.group(3), m.group(1)));
-        }
-
-        throwOnError(p);
-        this.formats = ImmutableList.copyOf(formats);
-      } finally {
-        p.destroy();
-      }
-    }
-    return formats;
+    return super.formats();
   }
 
   protected ProgressParser createProgressParser(ProgressListener listener) throws IOException {
