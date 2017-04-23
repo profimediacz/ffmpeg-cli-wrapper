@@ -1,6 +1,9 @@
 package net.bramp.ffmpeg;
 
 import com.google.gson.Gson;
+
+import net.bramp.ffmpeg.fixtures.Codecs;
+import net.bramp.ffmpeg.fixtures.Formats;
 import net.bramp.ffmpeg.fixtures.Samples;
 import net.bramp.ffmpeg.lang.NewProcessAnswer;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -45,6 +48,12 @@ public class FFprobeTest {
 
     when(runFunc.run(argThatHasItem(Samples.divide_by_zero)))
         .thenAnswer(new NewProcessAnswer("ffprobe-divide-by-zero"));
+
+    when(runFunc.run(argThatHasItem("-formats")))
+        .thenAnswer(new NewProcessAnswer("ffprobe-formats"));
+
+    when(runFunc.run(argThatHasItem("-codecs")))
+        .thenAnswer(new NewProcessAnswer("ffprobe-codecs"));
 
     ffprobe = new FFprobe(runFunc);
   }
@@ -114,5 +123,23 @@ public class FFprobeTest {
     assertThat(info.getStreams().get(1).codec_time_base, is(Fraction.ZERO));
 
     // System.out.println(FFmpegUtils.getGson().toJson(info));
+  }
+
+  @Test
+  public void testCodecs() throws IOException {
+    // Run twice, the second should be cached
+    assertEquals(Codecs.CODECS, ffprobe.codecs());
+    assertEquals(Codecs.CODECS, ffprobe.codecs());
+
+    verify(runFunc, times(1)).run(argThatHasItem("-codecs"));
+  }
+
+  @Test
+  public void testFormats() throws IOException {
+    // Run twice, the second should be cached
+    assertEquals(Formats.FORMATS, ffprobe.formats());
+    assertEquals(Formats.FORMATS, ffprobe.formats());
+
+    verify(runFunc, times(1)).run(argThatHasItem("-formats"));
   }
 }
