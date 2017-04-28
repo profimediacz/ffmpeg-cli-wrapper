@@ -38,7 +38,7 @@ abstract class FFcommon {
   static final Pattern CODECS_REGEX_OLD =
       Pattern.compile("^ ([ D][ E][VAS][ S][ D][ T]) (\\S+)\\s+(.*)$");
   static final Pattern CODECS_REGEX =
-      Pattern.compile("^ ([\\.D][\\.E][VAS][\\.I][\\.L][\\.S]) (\\S+)\\s+(.*)$");
+      Pattern.compile("^ ([\\.D][\\.E][VASD][\\.I][\\.L][\\.S]) (\\S+)\\s+(.*)$");
   static final Pattern FORMATS_REGEX = Pattern.compile("^ ([ D][ E]) (\\S+)\\s+(.*)$");
 
   /** Supported codecs */
