@@ -128,8 +128,8 @@ public class FFprobeTest {
   @Test
   public void testCodecs() throws IOException {
     // Run twice, the second should be cached
-    assertEquals(Codecs.CODECS, ffprobe.codecs());
-    assertEquals(Codecs.CODECS, ffprobe.codecs());
+    assertEquals(Codecs.CODECS_NEW, ffprobe.codecs());
+    assertEquals(Codecs.CODECS_NEW, ffprobe.codecs());
 
     verify(runFunc, times(1)).run(argThatHasItem("-codecs"));
   }
