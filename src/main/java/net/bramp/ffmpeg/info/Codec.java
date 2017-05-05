@@ -16,7 +16,8 @@ public class Codec {
   enum Type {
     VIDEO,
     AUDIO,
-    SUBTITLE
+    SUBTITLE,
+    D_UNKNOW
   }
 
   final String name;
@@ -36,6 +37,7 @@ public class Codec {
    * @param longName long codec name
    * @param flags is expected to be in the following format:
    *     <pre>
+   * old version ffmpeg:
    * D..... = Decoding supported
    * .E.... = Encoding supported
    * ..V... = Video codec
@@ -44,6 +46,15 @@ public class Codec {
    * ...S.. = Supports draw_horiz_band
    * ....D. = Supports direct rendering method 1
    * .....T = Supports weird frame truncation
+   * new version ffmpeg and ffprobe (3.2.4)
+   * D..... = Decoding supported
+   * .E.... = Encoding supported
+   * ..V... = Video codec
+   * ..A... = Audio codec
+   * ..S... = Subtitle codec
+   * ...I.. = Intra frame-only codec
+   * ....L. = Lossy compression
+   * .....S = Lossless compression
    * </pre>
    */
   public Codec(String name, String longName, String flags) {
@@ -64,6 +75,9 @@ public class Codec {
         break;
       case 'S':
         this.type = Type.SUBTITLE;
+        break;
+      case 'D':
+        this.type = Type.D_UNKNOW;
         break;
       default:
         throw new IllegalArgumentException("Invalid codec type '" + flags.charAt(3) + "'");
