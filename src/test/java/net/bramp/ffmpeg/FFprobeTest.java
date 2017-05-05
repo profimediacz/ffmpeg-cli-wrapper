@@ -137,8 +137,8 @@ public class FFprobeTest {
   @Test
   public void testFormats() throws IOException {
     // Run twice, the second should be cached
-    assertEquals(Formats.FORMATS, ffprobe.formats());
-    assertEquals(Formats.FORMATS, ffprobe.formats());
+    assertEquals(Formats.FORMATS_NEW, ffprobe.formats());
+    assertEquals(Formats.FORMATS_NEW, ffprobe.formats());
 
     verify(runFunc, times(1)).run(argThatHasItem("-formats"));
   }
