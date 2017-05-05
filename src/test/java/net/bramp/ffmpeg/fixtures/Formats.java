@@ -231,8 +231,6 @@ public final class Formats {
               new Format("yuv4mpegpipe", "YUV4MPEG pipe format", "DE"))
           .build();
 
-
-  
   public static final ImmutableList<Format> FORMATS_NEW =
       new ImmutableList.Builder<Format>()
           .add(
@@ -387,7 +385,10 @@ public final class Formats {
               new Format("mgsts", "Metal Gear Solid: The Twin Snakes", "D "),
               new Format("microdvd", "MicroDVD subtitle format", "DE"),
               new Format("mjpeg", "raw MJPEG video", "DE"),
-              new Format("mkvtimestamp_v2", "extract pts as timecode v2 format, as defined by mkvtoolnix", " E"),
+              new Format(
+                  "mkvtimestamp_v2",
+                  "extract pts as timecode v2 format, as defined by mkvtoolnix",
+                  " E"),
               new Format("mlp", "raw MLP", "DE"),
               new Format("mlv", "Magic Lantern Video (MLV)", "D "),
               new Format("mm", "American Laser Games MM", "D "),
@@ -418,7 +419,8 @@ public final class Formats {
               new Format("mvi", "Motion Pixels MVI", "D "),
               new Format("mxf", "MXF (Material eXchange Format)", "DE"),
               new Format("mxf_d10", "MXF (Material eXchange Format) D-10 Mapping", " E"),
-              new Format("mxf_opatom", "MXF (Material eXchange Format) Operational Pattern Atom", " E"),
+              new Format(
+                  "mxf_opatom", "MXF (Material eXchange Format) Operational Pattern Atom", " E"),
               new Format("mxg", "MxPEG clip", "D "),
               new Format("nc", "NC camera feed", "D "),
               new Format("nistsphere", "NIST SPeech HEader REsources", "D "),
@@ -551,8 +553,6 @@ public final class Formats {
               new Format("xvag", "Sony PS3 XVAG", "D "),
               new Format("xwma", "Microsoft xWMA", "D "),
               new Format("yop", "Psygnosis YOP", "D "),
-              new Format("yuv4mpegpipe", "YUV4MPEG pipe", "DE")
-              )
+              new Format("yuv4mpegpipe", "YUV4MPEG pipe", "DE"))
           .build();
-
 }

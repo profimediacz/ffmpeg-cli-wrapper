@@ -52,8 +52,7 @@ public class FFprobeTest {
     when(runFunc.run(argThatHasItem("-formats")))
         .thenAnswer(new NewProcessAnswer("ffprobe-formats"));
 
-    when(runFunc.run(argThatHasItem("-codecs")))
-        .thenAnswer(new NewProcessAnswer("ffprobe-codecs"));
+    when(runFunc.run(argThatHasItem("-codecs"))).thenAnswer(new NewProcessAnswer("ffprobe-codecs"));
 
     ffprobe = new FFprobe(runFunc);
   }
