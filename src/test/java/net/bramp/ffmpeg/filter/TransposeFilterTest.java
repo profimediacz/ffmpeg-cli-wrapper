@@ -22,5 +22,10 @@ public class TransposeFilterTest {
     assertEquals(filter.getCommandString(), "transpose=dir=3:passthrough=none");
     filter = new TransposeFilter(Dir.CLOCK, Passthrough.PORTRAIT);
     assertEquals(filter.getCommandString(), "transpose=dir=1:passthrough=portrait");
+    
+    TransposeFilter filter2 = new TransposeFilter();
+    filter2.setRotateRight();
+    filter2.setPortrait();
+    assertEquals(filter2.getCommandString(), "transpose=dir=1:passthrough=portrait");
   }
 }
