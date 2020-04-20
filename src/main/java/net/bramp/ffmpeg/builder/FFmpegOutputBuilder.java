@@ -12,6 +12,7 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import javax.annotation.CheckReturnValue;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.*;
 import static net.bramp.ffmpeg.Preconditions.checkNotEmpty;
@@ -19,14 +20,18 @@ import static net.bramp.ffmpeg.Preconditions.checkNotEmpty;
 /** Builds a representation of a single output/encoding setting */
 public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutputBuilder> {
 
+  static final Pattern trailingZero = Pattern.compile("\\.0*$");
+
+  public Double constantRateFactor;
+
   public String audio_sample_format;
   public long audio_bit_rate;
-  public Integer audio_quality;
+  public Double audio_quality;
   public String audio_bit_stream_filter;
   public String audio_filter;
 
   public long video_bit_rate;
-  public Integer video_quality;
+  public Double video_quality;
   public String video_preset;
   public String video_filter;
   public String video_bit_stream_filter;
@@ -43,6 +48,12 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     super(parent, uri);
   }
 
+  public FFmpegOutputBuilder setConstantRateFactor(double factor) {
+    checkArgument(factor >= 0, "constant rate factor must be greater or equal to zero");
+    this.constantRateFactor = factor;
+    return this;
+  }
+
   public FFmpegOutputBuilder setVideoBitRate(long bit_rate) {
     checkArgument(bit_rate > 0, "bit rate must be positive");
     this.video_enabled = true;
@@ -50,7 +61,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     return this;
   }
 
-  public FFmpegOutputBuilder setVideoQuality(int quality) {
+  public FFmpegOutputBuilder setVideoQuality(double quality) {
     checkArgument(quality > 0, "quality must be positive");
     this.video_enabled = true;
     this.video_quality = quality;
@@ -74,10 +85,6 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     this.video_enabled = true;
     this.video_preset = checkNotEmpty(preset, "video preset must not be empty");
     return this;
-  }
-
-  protected static boolean isValidSize(int widthOrHeight) {
-    return widthOrHeight > 0 || widthOrHeight == -1;
   }
 
   /**
@@ -142,7 +149,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     return this;
   }
 
-  public FFmpegOutputBuilder setAudioQuality(int quality) {
+  public FFmpegOutputBuilder setAudioQuality(double quality) {
     checkArgument(quality > 0, "quality must be positive");
     this.audio_enabled = true;
     this.audio_quality = quality;
@@ -230,6 +237,9 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     if (targetSize > 0) {
       checkState(parent.inputs.size() == 1, "Target size does not support multiple inputs");
 
+      checkArgument(
+          constantRateFactor == null, "Target size can not be used with constantRateFactor");
+
       String firstInput = parent.inputs.iterator().next();
       FFmpegProbeResult input = parent.inputProbes.get(firstInput);
 
@@ -256,6 +266,26 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     return super.build(parent, pass);
   }
 
+  /**
+   * Returns a double formatted as a string. If the double is an integer, then trailing zeros are
+   * striped.
+   *
+   * @param d the double to format.
+   * @return The formatted double.
+   */
+  protected static String formatDecimalInteger(double d) {
+    return trailingZero.matcher(String.valueOf(d)).replaceAll("");
+  }
+
+  @Override
+  protected void addGlobalFlags(FFmpegBuilder parent, ImmutableList.Builder<String> args) {
+    super.addGlobalFlags(parent, args);
+
+    if (constantRateFactor != null) {
+      args.add("-crf", formatDecimalInteger(constantRateFactor));
+    }
+  }
+
   @Override
   protected void addVideoFlags(FFmpegBuilder parent, ImmutableList.Builder<String> args) {
     super.addVideoFlags(parent, args);
@@ -270,7 +300,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     }
 
     if (video_quality != null) {
-      args.add("-qscale:v", String.valueOf(video_quality));
+      args.add("-qscale:v", formatDecimalInteger(video_quality));
     }
 
     if (!Strings.isNullOrEmpty(video_preset)) {
@@ -307,7 +337,7 @@ public class FFmpegOutputBuilder extends AbstractFFmpegStreamBuilder<FFmpegOutpu
     }
 
     if (audio_quality != null) {
-      args.add("-qscale:a", String.valueOf(audio_quality));
+      args.add("-qscale:a", formatDecimalInteger(audio_quality));
     }
 
     if (!Strings.isNullOrEmpty(audio_bit_stream_filter)) {

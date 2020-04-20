@@ -20,7 +20,7 @@ Maven:
 <dependency>
   <groupId>net.bramp.ffmpeg</groupId>
   <artifactId>ffmpeg</artifactId>
-  <version>0.6.1</version>
+  <version>0.6.2</version>
 </dependency>
 ```
 
@@ -62,7 +62,7 @@ FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 // Run a one-pass encode
 executor.createJob(builder).run();
 
-// Or run a two-pass encode (which is slower at the cost of better quality)
+// Or run a two-pass encode (which is better quality at the cost of being slower)
 executor.createTwoPassJob(builder).run();
 ```
 

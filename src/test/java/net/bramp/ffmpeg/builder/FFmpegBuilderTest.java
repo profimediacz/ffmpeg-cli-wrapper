@@ -172,7 +172,7 @@ public class FFmpegBuilderTest {
   public void testSetOptions() {
     MainEncodingOptions main = new MainEncodingOptions("mp4", 1500L, 2L);
     AudioEncodingOptions audio =
-        new AudioEncodingOptions(true, "aac", 1, AUDIO_SAMPLE_48000, AUDIO_FORMAT_S16, 1, 2);
+        new AudioEncodingOptions(true, "aac", 1, AUDIO_SAMPLE_48000, AUDIO_FORMAT_S16, 1, 2.0);
     VideoEncodingOptions video =
         new VideoEncodingOptions(true, "libx264", FPS_30, 320, 240, 1, null, null, null);
 
@@ -351,7 +351,6 @@ public class FFmpegBuilderTest {
 
   @Test
   public void testExtraArgs() {
-
     List<String> args =
         new FFmpegBuilder()
             .addExtraArgs("-a", "b")
@@ -376,7 +375,6 @@ public class FFmpegBuilderTest {
 
   @Test
   public void testMultipleInput() {
-
     List<String> args =
         new FFmpegBuilder()
             .addInput("input1")
@@ -391,7 +389,6 @@ public class FFmpegBuilderTest {
 
   @Test
   public void testAlternativeBuilderPattern() {
-
     List<String> args =
         new FFmpegBuilder()
             .addInput("input")
